@@ -27,43 +27,48 @@ class Operand(object):
 lineNumber = -1
 fileName = ""
 
-def parse(name, input):
-    global lineNumber, fileName
-    fileName = name
-
+class Parser:
+    lineNumber = None
+    fileName = None
     labels = {} # Labels for this program.
     instructions = [] # Instructions for this program.
+    input = None
 
-    input = input.lower()
-    lines = input.split('\n')
+    def __init__(self, name=None, code=None):
+        self.input = code
+        self.fileName = name
 
-    for index, line in enumerate(lines):
-        lineNumber = index
+    def parse(self):
+        self.input = self.input.lower()
+        lines = self.input.split('\n')
 
-        # Throw away comments and leading whitespace.
-        line = line.split(';')[0].lstrip() 
-        # It is much faster to do replace->split than to do re.split.
-        tokens = line.replace(',', ' ').replace('\t', ' ').replace('\r', ' ').split(' ')
+        for index, line in enumerate(lines):
+            self.lineNumber = index
 
-        # Nothing to see here.
-        if len(tokens) == 0 or tokens[0] == '':
-            continue
-        # Check if this is a label.
-        elif ':' in tokens[0]:
-            label = tokens[0].split(':')[0]
-            if label not in labels:
-                labels[label] = index
-            # If label already exists, return an error.
-            #else:
-                #pass
+            # Throw away comments and leading whitespace.
+            line = line.split(';')[0].lstrip() 
+            # It is much faster to do replace->split than to do re.split.
+            tokens = line.replace(',', ' ').replace('\t', ' ').replace('\r', ' ').split(' ')
 
-        # Check if this is an instruction.
-        elif tokens[0] in opcodes:
-            instructions.append(parseInstruction(tokens))
-        # If none of the above, return an error.
-        else:
-            Error("Invalid instruction: {}".format(tokens[0]))
-    return (labels, instructions)
+            # Nothing to see here.
+            if len(tokens) == 0 or tokens[0] == '':
+                continue
+            # Check if this is a label.
+            elif ':' in tokens[0]:
+                label = tokens[0].split(':')[0]
+                if label not in self.labels:
+                    self.labels[label] = index
+                # If label already exists, return an error.
+                #else:
+                    #pass
+
+            # Check if this is an instruction.
+            elif tokens[0] in opcodes:
+                self.instructions.append(parseInstruction(tokens))
+            # If none of the above, return an error.
+            else:
+                Error("Invalid instruction: {}".format(tokens[0]))
+        return
 
 
 def parseInstruction(tokens):
@@ -93,6 +98,7 @@ def parseInstruction(tokens):
     
     return Instruction(tokens[0], operands)
 
+
 def Error(str):
     raise Exception('<{}, line {}> {}'.format(fileName, lineNumber, str))
 
@@ -109,6 +115,7 @@ def isInteger(str):
     return str.isdigit()
 
 
-a = parse('azh.txt', 'add 5, 3, 2\nadd 2, r0, r3 ')
-print(a[0])
-print(len(a[1]))
+p = Parser('azh.txt', 'add 5, 3, 2\nadd 2, r0, r3\nloop:\ngoto loop')
+p.parse()
+print(p.labels)
+print(len(p.instructions))
