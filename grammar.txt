@@ -1,0 +1,4 @@
+program = {instruction | label}
+instruction = ident operand {"," operand}
+operand = ident | int
+label = ident ":"
