@@ -20,12 +20,10 @@ class Instruction(object):
         self.operands = operands
 
 class Operand(object):
-    def __init__(self, token=None, opType=None):
+    def __init__(self, token=None, opType=None, prefixed=None):
         self.token = token
-        self.type = opType # LABEL or INT or REG
-
-lineNumber = -1
-fileName = ""
+        self.type = opType # LABEL or INT or REG.
+        self.prefixed = prefixed # Is this prefixed with $?
 
 class Parser:
     lineNumber = None
@@ -43,7 +41,7 @@ class Parser:
         lines = self.input.split('\n')
 
         for index, line in enumerate(lines):
-            self.lineNumber = index
+            self.lineNumber = index + 1
 
             # Throw away comments and leading whitespace.
             line = line.split(';')[0].lstrip() 
@@ -64,55 +62,63 @@ class Parser:
 
             # Check if this is an instruction.
             elif tokens[0] in opcodes:
-                self.instructions.append(parseInstruction(tokens))
+                self.instructions.append(self.parseInstruction(tokens))
             # If none of the above, return an error.
             else:
-                Error("Invalid instruction: {}".format(tokens[0]))
+                self.Error("Invalid instruction: {}".format(tokens[0]))
         return
 
 
-def parseInstruction(tokens):
-    instToken = tokens[0]
-    expectedOperandCount = opcodes[instToken]
-    operands = []
+    def parseInstruction(self, tokens):
+        instToken = tokens[0]
+        expectedOperandCount = opcodes[instToken]
+        operands = []
 
-    for i in range(1, len(tokens)):
-        if tokens[i] == '':
-            continue
-        # Must either be label, integer, or register.
-        if isRegister(tokens[i]):
-            operands.append(Operand(tokens[i], "REG"))
-        elif isInteger(tokens[i]):
-            operands.append(Operand(tokens[i], "INT"))
-        else:
-            # Assume this must be a label (could be an error).
-            # Only goto allows label as operand.
-            if tokens[0] == 'goto':
-                operands.append(Operand(tokens[i], "LABEL"))
+        for i in range(1, len(tokens)):
+            t = tokens[i]
+            if t == '':
+                continue
+            
+            addr = False # Check if operand is prefixed for $, signifying address.
+            if t[0] == '$':
+                addr = True
+                t = t[1:]
+
+            # Must either be label, integer, or register.
+            if self.isRegister(t):
+                operands.append(Operand(t, "REG", addr))
+            elif self.isInteger(t):
+                operands.append(Operand(t, "INT", addr))
             else:
-                Error('Invalid operand: {}'.format(tokens[i]))
-    
-    # Check if correct number of operands are present.
-    if expectedOperandCount != len(operands):
-        Error('Expected {} operands, but got {}.'.format(expectedOperandCount, len(operands)))
-    
-    return Instruction(tokens[0], operands)
+                # Assume this must be a label (could be an error).
+                # Only goto allows label as operand.
+                # Label can not be prefixed.
+                if tokens[0] == 'goto' and addr == False:
+                    operands.append(Operand(t, "LABEL", False))
+                else:
+                    self.Error('Invalid operand: {}'.format(t))
+        
+        # Check if correct number of operands are present.
+        if expectedOperandCount != len(operands):
+            self.Error('Expected {} operands, but got {}.'.format(expectedOperandCount, len(operands)))
+        
+        return Instruction(tokens[0], operands)
 
 
-def Error(str):
-    raise Exception('<{}, line {}> {}'.format(fileName, lineNumber, str))
+    def Error(self, str):
+        raise Exception('<{}, line {}> {}'.format(self.fileName, self.lineNumber, str))
 
-def isRegister(str):
-    if len(str) == 2 and str[0] == 'r':
-        if str[1] == '0' or str[1] == '1' or str[1] == '2' or str[1] == '3':
-            return True
-    return False
+    def isRegister(self, str):
+        if len(str) == 2 and str[0] == 'r':
+            if str[1] == '0' or str[1] == '1' or str[1] == '2' or str[1] == '3':
+                return True
+        return False
 
 
-def isInteger(str):
-    if len(str) >= 2 and (str[0] == '+' or str[0] == '-'):
-        return str[1:].isdigit()
-    return str.isdigit()
+    def isInteger(self, str):
+        if len(str) >= 2 and (str[0] == '+' or str[0] == '-'):
+            return str[1:].isdigit()
+        return str.isdigit()
 
 
 p = Parser('azh.txt', 'add 5, 3, 2\nadd 2, r0, r3\nloop:\ngoto loop')
