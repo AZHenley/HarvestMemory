@@ -1,8 +1,10 @@
 from graphics import *
 import parser
 import player
+import cpu
 import os
 import random
+
 
 memorySize = 2**12
 memory = [0] * memorySize
@@ -100,7 +102,7 @@ def createPlayers():
                 players.append(player.Player(fileName.split('.')[0], p.instructions, p.labels))
         except Exception as e:
             print(e)
-            
+
     random.shuffle(players)
     return players
 
@@ -116,10 +118,10 @@ def main():
     drawColumns(win)
     updateColumns()
 
-    print(remainingFruit)
-
+    vm = cpu.CPU(memory, players)
     timer = 0
     while True:
+        vm.execute()
         drawObjects[timer].setFill("red")
         drawObjects[timer].setOutline("red")
         timer = timer + 1
