@@ -21,7 +21,7 @@ opcodes = { # Opcodes are keys, number of ticks are values.
 indirectTicks = 2 # number of ticks for each $
 harvestError = 20 # number of ticks if harvest fails
 
-valLimit = 2**16
+valLimit = 2**16 # Registers and memory values are signed 32-bit numbers
 
 class CPU(object):
     ticks = 0
@@ -35,7 +35,11 @@ class CPU(object):
         self.players = players
 
     def execute(self):
-        self.run(self.players[next])
+        nextPlayer = self.players[self.next]
+        if nextPlayer.delay == 0:
+            self.run(nextPlayer)
+        else:
+            nextPlayer.delay = nextPlayer.delay - 1
 
         self.next = self.next + 1
         if self.next == len(self.players):
@@ -97,9 +101,9 @@ class CPU(object):
 
     def getValue(self, player, op):
         val = -1
-        if op.opType == "INT":
+        if op.type == "INT":
             val = int(op.token)
-        elif op.opType == "REGISTER":
+        elif op.type == "REGISTER":
             val = self.getRegister(player, op.token)
 
         # Handle $ in front of values.
@@ -121,7 +125,7 @@ class CPU(object):
         if player.next == len(player.instructions):
             return
 
-        inst = player.instructions[next]
+        inst = player.instructions[player.next]
         op = inst.token
         operands = inst.operands
         dTicks = opcodes[op] # Keep track of ticks this run. Start with the instruction's tick cost.
@@ -206,8 +210,10 @@ class CPU(object):
         else: # Should never happen.
             pass
 
+        # Add in time for using $ prefix
         for o in operands:
             if o.prefixed:
                 dTicks = dTicks + indirectTicks 
-        player.next = player.next + 1
-        pass
+
+        player.delay = dTicks - 1 # Set delay based on instruction ticks
+        player.next = player.next + 1 # Next instruction to be executed
