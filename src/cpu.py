@@ -42,14 +42,6 @@ class CPU(object):
             self.next = 0
 
 
-    def execute(self):
-        self.run(self.players[next])
-
-        self.next = self.next + 1
-        if self.next == len(self.players):
-            self.next = 0
-
-
     def getMemoryValue(self, player, addr):
         if addr < 0 or addr >= len(self.memory): # Bounds check.
             player.registers["rf"] = 5
@@ -134,6 +126,85 @@ class CPU(object):
         operands = inst.operands
         dTicks = opcodes[op] # Keep track of ticks this run. Start with the instruction's tick cost.
 
+        if op == "harvest":
+            addr = self.getAddress(player, operands[0])
+            if self.getMemoryValue(player, addr) == -100:
+                self.setMemoryValue(player, addr, 0)
+                player.registers['rs'] = player.registers['rs'] + 5
+            else:
+                dTicks = dTicks + harvestError
+                player.registers['rf'] = 9
+
+        elif op == "plant":
+            if player.registers['rs'] > 0:
+                addr = self.getAddress(player, operands[0])
+                self.setMemoryValue(player, addr, -1)
+                player.registers['rs'] = player.registers['rs'] - 1
+            else:
+                player.registers['rf'] = 8
+
+        elif op == "peek":
+            addr = self.getAddress(player, operands[1])
+            self.setRegister(player, operands[0].token, addr)
+
+        elif op == "poke":
+            val = self.getValue(player, operands[1])
+            addr = self.getAddress(player, operands[0])
+            self.setMemoryValue(player, addr, val)
+
+        elif op == "goto":
+            self.gotoLabel(player, operands[0].token)
+
+        elif op == "ifequal":
+            val1 = self.getValue(player, operands[0])
+            val2 = self.getValue(player, operands[1])
+            if val1 == val2:
+                self.gotoLabel(player, operands[2])
+                
+        elif op == "ifless":
+            val1 = self.getValue(player, operands[0])
+            val2 = self.getValue(player, operands[1])
+            if val1 < val2:
+                self.gotoLabel(player, operands[2])
+
+        elif op == "ifmore":
+            val1 = self.getValue(player, operands[0])
+            val2 = self.getValue(player, operands[1])
+            if val1 > val2:
+                self.gotoLabel(player, operands[2])
+
+        elif op == "add":
+            val1 = self.getValue(player, operands[1])
+            val2 = self.getValue(player, operands[2])
+            self.setRegister(player, operands[0].token, val1+val2)
+
+        elif op == "sub":
+            val1 = self.getValue(player, operands[1])
+            val2 = self.getValue(player, operands[2])
+            self.setRegister(player, operands[0].token, val1-val2)
+
+        elif op == "mult":
+            val1 = self.getValue(player, operands[1])
+            val2 = self.getValue(player, operands[2])
+            self.setRegister(player, operands[0].token, val1*val2)
+
+        elif op == "div":
+            val1 = self.getValue(player, operands[1])
+            val2 = self.getValue(player, operands[2])
+            self.setRegister(player, operands[0].token, val1//val2)
+
+        elif op == "mod":
+            val1 = self.getValue(player, operands[1])
+            val2 = self.getValue(player, operands[2])
+            self.setRegister(player, operands[0].token, val1%val2)
+
+        elif op == "random":
+            val1 = self.getValue(player, operands[1])
+            val2 = self.getValue(player, operands[2])
+            self.setRegister(player, operands[0].token, random.randint(val1, val2+1)) 
+
+        else: # Should never happen.
+            pass
 
         for o in operands:
             if o.prefixed:
