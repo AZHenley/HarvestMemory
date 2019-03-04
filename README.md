@@ -4,12 +4,16 @@ A programming game written by Austin Henley for his software engineering courses
 
 The object of the game is to harvest more _fruit_ than any other player. Each player writes a program in an assembly-like language. Each program has access to shared memory where they can _plant_ and _harvest_ the fruit.
 
+![Harvest Memory's GUI.](https://github.com/AZHenley/HarvestMemory/blob/master/screenshot.png "Havest Memory's GUI. The left shows player scores. The right shows the memory. Red is fruit.")
+
 
 ## Fruit
 
 Fruits are represented in the memory by -100. _Harvesting_ a fruit will yield +5 to your current fruit score. Attempting to harvest a location that does not contain fruit will result in the CPU scheduler penalizing your program.
 
 You may also _plant_ fruit. This will set the memory value to -1 and will automatically decrement 1 each CPU cycle. Once the value reaches -100, it becomes a harvestable fruit.
+
+Fruit in memory can be destroyed by setting the value to any positive value.
 
 All players start with 3 fruit.
 
