@@ -1,4 +1,4 @@
 program = {instruction | label}
-instruction = ident operand {"," operand}
-operand = {"$"} (ident | int)
-label = ident ":"
+instruction = ident operand {"," operand} newline
+operand = {"$"} (ident | int) 
+label = ident ":" newline
