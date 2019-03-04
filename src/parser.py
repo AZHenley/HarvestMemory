@@ -1,3 +1,5 @@
+# TODO: Move opcodes, Instruction, and Operand into CPU or its own module.
+
 opcodes = { # Opcodes are keys, number of operands are values.
     'harvest': 1,
     'plant': 1,
@@ -11,6 +13,7 @@ opcodes = { # Opcodes are keys, number of operands are values.
     'sub': 3,
     'mult': 3,
     'div': 3,
+    'mod': 3,
     'random': 3
                 }
 
@@ -70,8 +73,8 @@ class Parser:
 
 
     def parseInstruction(self, tokens):
-        instToken = tokens[0]
-        expectedOperandCount = opcodes[instToken]
+        inst = tokens[0]
+        expectedOperandCount = opcodes[inst]
         operands = []
 
         for i in range(1, len(tokens)):
@@ -91,9 +94,9 @@ class Parser:
                 operands.append(Operand(t, "INT", addr))
             else:
                 # Assume this must be a label (could be an error).
-                # Only goto allows label as operand.
+                # Only goto, ifequal, ifmore, ifless allow label as operand.
                 # Label can not be prefixed.
-                if tokens[0] == 'goto' and addr == False:
+                if (inst == 'goto' or inst == 'ifequal' or inst == 'ifmore' or inst == 'ifless') and addr == False:
                     operands.append(Operand(t, "LABEL", False))
                 else:
                     self.Error('Invalid operand: {}'.format(t))
@@ -110,7 +113,7 @@ class Parser:
 
     def isRegister(self, str):
         if len(str) == 2 and str[0] == 'r':
-            if str[1] == '0' or str[1] == '1' or str[1] == '2' or str[1] == '3':
+            if str[1] == '0' or str[1] == '1' or str[1] == '2' or str[1] == '3' or str[1] == 's' or str[1] == 'w' or str[1] == 't' or str[1] == 'f':
                 return True
         return False
 
