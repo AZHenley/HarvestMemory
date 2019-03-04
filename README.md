@@ -1,6 +1,6 @@
 # HarvestMemory
 
-A programming game written by Austin Henley for his software engineering courses at the University of Tennessee. Currently it is a graphical Python app that requires having all the players' programs locally to execute, and currently supports up to 30 players.
+A programming game written by Austin Henley for his software engineering courses at the University of Tennessee. Currently it is a graphical Python app that requires all the players' programs to be local in order to execute, and currently supports up to 30 players.
 
 The object of the game is to harvest more _fruit_ than any other player. Each player writes a program in an assembly-like language. Each program has access to shared memory where they can _plant_ and _harvest_ the fruit.
 
