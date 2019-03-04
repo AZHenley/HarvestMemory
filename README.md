@@ -38,7 +38,7 @@ The registers are:
 * r3  - general purpose
 * rs  - number of fruit you have (read-only)
 * rw  - current winning score (read-only)
-* rf  - error flag (read-only)... 0 for nothing, 1 for underflow register, 2 for overflow register, 3 for underflow memory, 4 for overflow memory, 5 for out of bounds memory, 6 for poking negative value to memory, 7 for undefined label, 8 for invalid plant, 9 for invalid harvest, 10 for misc invalid operand
+* rf  - error flag (read-only)... set to 0 after each sucessful execution or to 1 for underflowing a register, 2 for overflowing register, 3 for underflowing memory, 4 for overflowing memory, 5 for accessing out of bounds memory, 6 for poking a negative value to memory, 7 for jumping to an undefined label, 8 for invalid plant, 9 for invalid harvest, and 10 for misc invalid operand
 * rt  - number of cycles elapsed since start of game (read-only) 
 
 
