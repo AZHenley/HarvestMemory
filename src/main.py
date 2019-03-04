@@ -7,6 +7,7 @@ import random
 memorySize = 2**12
 memory = [0] * memorySize
 drawObjects = []
+textObjects = []
 columnCount = 8
 columnHeight = len(memory) // columnCount
 cellHeight = 1
@@ -46,7 +47,7 @@ def initMemory():
     return memory
 
 def drawColumns(win):
-    xstart = 400
+    xstart = 480
     ystart = 100
     width = 40
     height = 2
@@ -59,6 +60,23 @@ def drawColumns(win):
             r.draw(win)
             drawObjects.append(r)
         offset = offset + 90
+
+
+def drawPlayers(win, players):
+    xstart = 100
+    ystart = 100
+    xoffset = 0
+    yoffset = 0
+    for p in range(1, len(players)+1):
+        t = Text(Point(xstart+xoffset, ystart+yoffset), players[p-1].displayName)
+        t.setSize(22)
+        t.draw(win)
+        textObjects.append(t)
+
+        yoffset = yoffset + 45
+        if p % 15 == 0:
+            xoffset = xoffset + 210
+            yoffset = 0
 
 
 def updateColumns():
@@ -79,20 +97,22 @@ def createPlayers():
                 code = f.read()
                 p = parser.Parser(fileName, code)
                 p.parse()
-                players.append(fileName.split('.')[0], player.Player(p.instructions, p.labels))
+                players.append(player.Player(fileName.split('.')[0], p.instructions, p.labels))
         except Exception as e:
             print(e)
+            
+    random.shuffle(players)
     return players
 
 
 def main():
     initMemory()
     players = createPlayers()
-    #if players == None:
-    #    return
+    if players == None:
+        return
 
     win = GraphWin("Harvest Memory", 1280, 800, autoflush=False)
-    #drawPlayers(win, players)
+    drawPlayers(win, players)
     drawColumns(win)
     updateColumns()
 
