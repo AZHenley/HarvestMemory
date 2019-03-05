@@ -106,7 +106,8 @@ This program will check random locations for fruit. If it finds one, it harvests
 
     main:
         random r0, 0, 4095
-        ifequal $r0, -100, found 
+        ifequal $r0, -100, found
+        goto main
     found:
         harvest $r0
         goto main
