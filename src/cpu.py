@@ -19,20 +19,19 @@ opcodes = { # Opcodes are keys, number of ticks are values.
     'random': 6
                 }
 indirectTicks = 2 # number of ticks for each $
-harvestError = 20 # number of ticks if harvest fails
+harvestError = 15 # number of ticks if harvest fails
 
 valLimit = 2**16 # Registers and memory values are signed 32-bit numbers
 
 class CPU(object):
     ticks = 0
     next = 0
-    remainingFruit = 0
-    fruit = [] # TODO: Get this from main. List of indices where seeds or fruit are.
     registers = {'rw': 0, 'rt': 0}
 
-    def __init__(self, memory=None, players=None):
+    def __init__(self, memory=None, fruit=None, players=None):
         self.memory = memory
         self.players = players
+        self.fruit = fruit
 
     def execute(self):
         nextPlayer = self.players[self.next]
@@ -45,6 +44,16 @@ class CPU(object):
         if self.next == len(self.players):
             self.next = 0
 
+        # Update fruits
+        for f in self.fruit:
+            self.memory[f] = self.memory - 1
+            if self.memory[f] < -100:
+                self.memory[f] = -100
+        
+        # Update global registers
+        self.registers['rt'] = self.ticks
+        self.registers['rw'] = max(p.registers['rs'] for p in self.players)
+
 
     def getMemoryValue(self, player, addr):
         if addr < 0 or addr >= len(self.memory): # Bounds check.
@@ -53,9 +62,28 @@ class CPU(object):
         return self.memory[addr]
 
 
+    def plantMemory(self, player, addr):
+        if addr < 0 or addr >= len(self.memory): # Bounds check.
+            player.registers["rf"] = 5
+            return
+
+        if self.getMemoryValue(player, addr) < 0:
+            self.fruit.remove(addr)
+
+        self.memory[addr] = -1
+        self.fruit.add(addr)
+
+
     def setMemoryValue(self, player, addr, val):
         if addr < 0 or addr >= len(self.memory): # Bounds check.
             player.registers["rf"] = 5
+            return
+
+        # Update fruit.
+        if self.getMemoryValue(player, addr) < 0:
+            self.fruit.remove(addr)
+
+        # Set value and wrap if needed.
         if val > 0 and val < valLimit:
             self.memory[addr] = val
         elif val < 0:
@@ -129,12 +157,14 @@ class CPU(object):
         op = inst.token
         operands = inst.operands
         dTicks = opcodes[op] # Keep track of ticks this run. Start with the instruction's tick cost.
+        player.registers['rf'] = 0 # Reset error flag
 
         if op == "harvest":
             addr = self.getAddress(player, operands[0])
             if self.getMemoryValue(player, addr) == -100:
                 self.setMemoryValue(player, addr, 0)
                 player.registers['rs'] = player.registers['rs'] + 5
+                self.fruit.remove(addr)
             else:
                 dTicks = dTicks + harvestError
                 player.registers['rf'] = 9
@@ -142,7 +172,8 @@ class CPU(object):
         elif op == "plant":
             if player.registers['rs'] > 0:
                 addr = self.getAddress(player, operands[0])
-                self.setMemoryValue(player, addr, -1)
+                #self.setMemoryValue(player, addr, -1)
+                self.plantMemory(player, addr)
                 player.registers['rs'] = player.registers['rs'] - 1
             else:
                 player.registers['rf'] = 8
@@ -215,5 +246,6 @@ class CPU(object):
             if o.prefixed:
                 dTicks = dTicks + indirectTicks 
 
-        player.delay = dTicks - 1 # Set delay based on instruction ticks
+        self.ticks = self.ticks + dTicks
+        player.delay = dTicks # Set delay based on instruction ticks
         player.next = player.next + 1 # Next instruction to be executed

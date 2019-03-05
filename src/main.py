@@ -15,11 +15,10 @@ columnHeight = len(memory) // columnCount
 cellHeight = 1
 initialSeeds = 20
 decay = 0.7
-remainingFruit = 0
+fruit = set()
 
 
 def initMemory():
-    global remainingFruit
     # Randomly pick some starting points
     seeds = []
     for i in range(initialSeeds):
@@ -28,8 +27,8 @@ def initMemory():
     # Add fruit at the random points in memory.
     # Use a decay function, 0.75^x, to add more fruit nearby.
     for seed in seeds:
-        remainingFruit = remainingFruit + 1
         memory[seed] = -100
+        fruit.add(seed)
         chance = decay
         i = 1
         while chance > 0.01:
@@ -40,10 +39,11 @@ def initMemory():
                 if seed-i > 0:
                     remainingFruit = remainingFruit + 1
                     memory[seed-i] = -100
+                    fruit.add(seed)
             if rRight <= chance:
                 if seed+i < len(memory)-1:
-                    remainingFruit = remainingFruit + 1
                     memory[seed+i] = -100
+                    fruit.add(seed)
             i = i + 1
             chance = decay**i
     return memory
@@ -70,7 +70,8 @@ def drawPlayers(win, players):
     xoffset = 0
     yoffset = 0
     for p in range(1, len(players)+1):
-        t = Text(Point(xstart+xoffset, ystart+yoffset), players[p-1].displayName)
+        t = Text(Point(xstart+xoffset, ystart+yoffset), " ")
+        t.setText(players[p-1].displayName + ": 3")
         t.setSize(22)
         t.draw(win)
         textObjects.append(t)
@@ -118,7 +119,7 @@ def main():
     drawColumns(win)
     updateColumns()
 
-    vm = cpu.CPU(memory, players)
+    vm = cpu.CPU(memory, fruit, players)
     timer = 0
     while True:
         vm.execute()
