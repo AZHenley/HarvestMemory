@@ -139,14 +139,17 @@ def main():
     vm = cpu.CPU(memory, fruit, players)
     timer = 0
     while True:
-        vm.execute()
+        for i in range(0, 100): # Speed it up!
+            if vm.ticks < 10000:
+                vm.execute()
 
-        if timer % 10 == 0: # Only update periodically
+        if timer % 4 == 0: # Only update periodically
             updatePlayers(players)
             updateMemoryGraphics(vm.fruit)
+            print("Ticks: " + str(vm.ticks))
 
         timer = timer + 1
-        update(10) # 10 frames per second 
+        update(5) # 5 frames per second 
     #win.close()   
 
 
