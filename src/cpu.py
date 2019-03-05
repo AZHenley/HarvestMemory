@@ -86,7 +86,7 @@ class CPU(object):
             self.fruit.remove(addr)
 
         # Set value and wrap if needed.
-        if val > 0 and val < valLimit:
+        if val >= 0 and val < valLimit:
             self.memory[addr] = val
         elif val < 0:
             self.memory[addr] = val % (valLimit - 1)
@@ -172,7 +172,6 @@ class CPU(object):
             if self.getMemoryValue(player, addr) == -100:
                 self.setMemoryValue(player, addr, 0)
                 player.registers['rs'] = player.registers['rs'] + 5
-                #self.fruit.remove(addr) # TODO: Why is this throwing an exception?
             else:
                 dTicks = dTicks + harvestError
                 player.registers['rf'] = 9
