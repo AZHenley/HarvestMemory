@@ -36,9 +36,9 @@ class CPU(object):
         nextPlayer = self.players[self.next]
         if nextPlayer.delay == 0:
             #try:
-            self.run(nextPlayer)
+                self.run(nextPlayer)
             #except Exception as e:
-                #print("Exception thrown by " + nextPlayer.displayName)
+            #    print("Exception thrown by " + nextPlayer.displayName)
         else:
             nextPlayer.delay = nextPlayer.delay - 1
 
@@ -162,19 +162,24 @@ class CPU(object):
         player.registers['rf'] = 0 # Reset error flag
 
         # For debugging:
-        #print(player.displayName + "  " + op + "  " + str(player.next) + " of " + str(len(player.instructions)))
+        if player.displayName == "plante":
+            print(player.displayName + "  " + op + "  " + str(player.next) + " of " + str(len(player.instructions)))
 
         if op == "harvest":
+            print(player.displayName + " is harvesting!")
+
             addr = self.getAddress(player, operands[0])
             if self.getMemoryValue(player, addr) == -100:
                 self.setMemoryValue(player, addr, 0)
                 player.registers['rs'] = player.registers['rs'] + 5
-                self.fruit.remove(addr)
+                #self.fruit.remove(addr) # TODO: Why is this throwing an exception?
             else:
                 dTicks = dTicks + harvestError
                 player.registers['rf'] = 9
 
         elif op == "plant":
+            print(player.displayName + " is planting!")
+
             if player.registers['rs'] > 0:
                 addr = self.getAddress(player, operands[0])
                 #self.setMemoryValue(player, addr, -1)
@@ -199,19 +204,19 @@ class CPU(object):
             val1 = self.getValue(player, operands[0])
             val2 = self.getValue(player, operands[1])
             if val1 == val2:
-                self.gotoLabel(player, operands[2])
+                self.gotoLabel(player, operands[2].token)
                 
         elif op == "ifless":
             val1 = self.getValue(player, operands[0])
             val2 = self.getValue(player, operands[1])
             if val1 < val2:
-                self.gotoLabel(player, operands[2])
+                self.gotoLabel(player, operands[2].token)
 
         elif op == "ifmore":
             val1 = self.getValue(player, operands[0])
             val2 = self.getValue(player, operands[1])
             if val1 > val2:
-                self.gotoLabel(player, operands[2])
+                self.gotoLabel(player, operands[2].token)
 
         elif op == "add":
             val1 = self.getValue(player, operands[1])
