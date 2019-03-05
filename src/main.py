@@ -37,13 +37,12 @@ def initMemory():
             rRight = random.random()
             if rLeft <= chance:
                 if seed-i > 0:
-                    remainingFruit = remainingFruit + 1
                     memory[seed-i] = -100
-                    fruit.add(seed)
+                    fruit.add(seed-i)
             if rRight <= chance:
                 if seed+i < len(memory)-1:
                     memory[seed+i] = -100
-                    fruit.add(seed)
+                    fruit.add(seed+i)
             i = i + 1
             chance = decay**i
     return memory
@@ -108,6 +107,23 @@ def createPlayers():
     return players
 
 
+def updateMemoryGraphics(vmFruit): 
+    # Greatly optimize this by just using sets of recently added/removed fruit
+    for i in range(0, len(drawObjects), 1):
+        if i in vmFruit:
+            drawObjects[i].setFill("red")
+            drawObjects[i].setOutline("red")
+        else:
+            drawObjects[i].setFill("black")
+            drawObjects[i].setOutline("black")
+        
+
+def updatePlayers(players):
+    for i in range(0, len(players)):
+        out = players[i].displayName + ": " + str(players[i].registers['rs'])
+        textObjects[i].setText(out)
+
+
 def main():
     initMemory()
     players = createPlayers()
@@ -123,10 +139,13 @@ def main():
     timer = 0
     while True:
         vm.execute()
-        drawObjects[timer].setFill("red")
-        drawObjects[timer].setOutline("red")
+
+        if timer % 10 == 0: # Only update periodically
+            updatePlayers(players)
+            updateMemoryGraphics(vm.fruit)
+
         timer = timer + 1
-        update(10)
+        update(10) # 10 frames per second 
     #win.close()   
 
 
