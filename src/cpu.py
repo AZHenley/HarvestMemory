@@ -35,10 +35,10 @@ class CPU(object):
     def execute(self):
         nextPlayer = self.players[self.next]
         if nextPlayer.delay == 0:
-            #try:
+            try:
                 self.run(nextPlayer)
-            #except Exception as e:
-            #    print("Exception thrown by " + nextPlayer.displayName)
+            except Exception as e:
+                print("Exception thrown by " + nextPlayer.displayName)
         else:
             nextPlayer.delay = nextPlayer.delay - 1
 
@@ -149,6 +149,7 @@ class CPU(object):
             player.next = player.labels[label] - 1 # We will add 1 at the end.
         else:
             player.registers['rf'] = 7
+            print(player.displayName + " failed goto " + label)
 
 
     def run(self, player):
@@ -163,8 +164,8 @@ class CPU(object):
         player.registers['rf'] = 0 # Reset error flag
 
         # For debugging:
-        if player.displayName == "azh2":
-            print(player.displayName + "  " + op + "  " + str(player.next) + " of " + str(len(player.instructions)))
+        #if player.displayName == "azh2":
+        #    print(player.displayName + "  " + op + "  " + str(player.next) + " of " + str(len(player.instructions)))
 
         if op == "harvest":
             #print(player.displayName + " is harvesting!")
