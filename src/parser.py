@@ -55,7 +55,7 @@ class Parser:
             elif ':' in tokens[0]:
                 label = tokens[0].split(':')[0]
                 if label not in self.labels:
-                    self.labels[label] = index
+                    self.labels[label] = len(self.instructions)
                 # If label already exists, return an error.
                 #else:
                     #pass
