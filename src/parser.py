@@ -29,15 +29,12 @@ class Operand(object):
         self.prefixed = prefixed # Is this prefixed with $?
 
 class Parser:
-    lineNumber = None
-    fileName = None
-    labels = {} # Labels for this program.
-    instructions = [] # Instructions for this program.
-    input = None
-
     def __init__(self, name=None, code=None):
         self.input = code
         self.fileName = name
+        self.lineNumber = None
+        self.labels = {} # Labels for this program.
+        self.instructions = [] # Instructions for this program.
 
     def parse(self):
         self.input = self.input.lower()
@@ -123,8 +120,3 @@ class Parser:
             return str[1:].isdigit()
         return str.isdigit()
 
-
-p = Parser('azh.txt', 'add 5, 3, 2\nadd 2, r0, r3\nloop:\ngoto loop')
-p.parse()
-print(p.labels)
-print(len(p.instructions))

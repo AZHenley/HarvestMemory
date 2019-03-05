@@ -24,19 +24,21 @@ harvestError = 15 # number of ticks if harvest fails
 valLimit = 2**16 # Registers and memory values are signed 32-bit numbers
 
 class CPU(object):
-    ticks = 0
-    next = 0
-    registers = {'rw': 0, 'rt': 0}
-
     def __init__(self, memory=None, fruit=None, players=None):
         self.memory = memory
         self.players = players
         self.fruit = fruit
+        self.ticks = 0
+        self.next = 0
+        self.registers = {'rw': 0, 'rt': 0}
 
     def execute(self):
         nextPlayer = self.players[self.next]
         if nextPlayer.delay == 0:
+            #try:
             self.run(nextPlayer)
+            #except Exception as e:
+                #print("Exception thrown by " + nextPlayer.displayName)
         else:
             nextPlayer.delay = nextPlayer.delay - 1
 
@@ -46,7 +48,7 @@ class CPU(object):
 
         # Update fruits
         for f in self.fruit:
-            self.memory[f] = self.memory - 1
+            self.memory[f] = self.memory[f] - 1
             if self.memory[f] < -100:
                 self.memory[f] = -100
         
@@ -120,9 +122,9 @@ class CPU(object):
 
     def getAddress(self, player, op):
         addr = -1
-        if op.opType == "INT":
+        if op.type == "INT":
             addr = int(op.token)
-        elif op.opType == "REGISTER":
+        elif op.type == "REGISTER":
             addr = self.getRegister(player, op.token)
         return addr
 
@@ -150,7 +152,7 @@ class CPU(object):
 
     def run(self, player):
         # Check if player's program has ended.
-        if player.next == len(player.instructions):
+        if player.next >= len(player.instructions):
             return
 
         inst = player.instructions[player.next]
@@ -158,6 +160,9 @@ class CPU(object):
         operands = inst.operands
         dTicks = opcodes[op] # Keep track of ticks this run. Start with the instruction's tick cost.
         player.registers['rf'] = 0 # Reset error flag
+
+        # For debugging:
+        #print(player.displayName + "  " + op + "  " + str(player.next) + " of " + str(len(player.instructions)))
 
         if op == "harvest":
             addr = self.getAddress(player, operands[0])
