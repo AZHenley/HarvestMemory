@@ -124,8 +124,9 @@ class CPU(object):
         addr = -1
         if op.type == "INT":
             addr = int(op.token)
-        elif op.type == "REGISTER":
+        elif op.type == "REG":
             addr = self.getRegister(player, op.token)
+
         return addr
 
 
@@ -133,7 +134,7 @@ class CPU(object):
         val = -1
         if op.type == "INT":
             val = int(op.token)
-        elif op.type == "REGISTER":
+        elif op.type == "REG":
             val = self.getRegister(player, op.token)
 
         # Handle $ in front of values.
@@ -162,11 +163,11 @@ class CPU(object):
         player.registers['rf'] = 0 # Reset error flag
 
         # For debugging:
-        if player.displayName == "plante":
+        if player.displayName == "azh2":
             print(player.displayName + "  " + op + "  " + str(player.next) + " of " + str(len(player.instructions)))
 
         if op == "harvest":
-            print(player.displayName + " is harvesting!")
+            #print(player.displayName + " is harvesting!")
 
             addr = self.getAddress(player, operands[0])
             if self.getMemoryValue(player, addr) == -100:
@@ -177,7 +178,7 @@ class CPU(object):
                 player.registers['rf'] = 9
 
         elif op == "plant":
-            print(player.displayName + " is planting!")
+            #print(player.displayName + " is planting!")
 
             if player.registers['rs'] > 0:
                 addr = self.getAddress(player, operands[0])
