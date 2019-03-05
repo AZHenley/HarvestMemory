@@ -111,8 +111,9 @@ def updateMemoryGraphics(vmFruit):
     # Greatly optimize this by just using sets of recently added/removed fruit
     for i in range(0, len(drawObjects), 1):
         if i in vmFruit:
-            drawObjects[i].setFill("red")
-            drawObjects[i].setOutline("red")
+            if memory[i] == -100:
+                drawObjects[i].setFill("red")
+                drawObjects[i].setOutline("red")
         else:
             drawObjects[i].setFill("black")
             drawObjects[i].setOutline("black")
