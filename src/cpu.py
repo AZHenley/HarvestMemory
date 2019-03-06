@@ -237,7 +237,10 @@ class CPU(object):
         elif op == "div":
             val1 = self.getValue(player, operands[1])
             val2 = self.getValue(player, operands[2])
-            self.setRegister(player, operands[0].token, val1//val2)
+            if val2 == 0:
+                player.registers['rf'] = 10
+            else:
+                self.setRegister(player, operands[0].token, val1//val2)
 
         elif op == "mod":
             val1 = self.getValue(player, operands[1])
