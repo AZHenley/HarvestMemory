@@ -1,0 +1,7 @@
+main:
+    random r0, 0, 4095
+    ifequal $r0, -100, found 
+    goto main
+found:
+    harvest $r0
+    goto main
