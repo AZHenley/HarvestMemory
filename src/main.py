@@ -65,7 +65,7 @@ def drawColumns(win):
 
 def drawPlayers(win, players):
     xstart = 100
-    ystart = 100
+    ystart = 130
     xoffset = 0
     yoffset = 0
     for p in range(1, len(players)+1):
@@ -75,10 +75,19 @@ def drawPlayers(win, players):
         t.draw(win)
         textObjects.append(t)
 
-        yoffset = yoffset + 45
+        yoffset = yoffset + 42
         if p % 15 == 0:
             xoffset = xoffset + 210
             yoffset = 0
+
+
+def drawTitle(win):
+    t1 = Text(Point(230, 45), "Harvest Miner")
+    t1.setSize(36)
+    t1.draw(win)
+    t2 = Text(Point(220, 75), "by Austin Henley")
+    t2.setSize(16)
+    t2.draw(win)
 
 
 def updateColumns():
@@ -132,6 +141,7 @@ def main():
         return
 
     win = GraphWin("Harvest Memory", 1280, 800, autoflush=False)
+    drawTitle(win)
     drawPlayers(win, players)
     drawColumns(win)
     updateColumns()
