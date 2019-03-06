@@ -56,48 +56,22 @@ Operands for instructions:
 
 The instructions:
 
-* harvest a
-  * Harvests fruit at _a_.
-  * Takes 5 cycles if there is fruit, 20 if not.
-* plant a
-  * Plants 1 of your fruits at _a_.
-  * Takes 4 cycles.
-* peek r, a
-  * Copies value at _a_ to _r_.
-  * Takes 4 cyles.
-* poke a, v
-  * Sets _a_ to _v_.
-  Takes 3 cycles.
-* goto l
-  * Jumps to _l_.
-  * Takes 1 cycle.
-* ifequal v, v, l
-  * If _v_<sub>1</sub> equals _v_<sub>2</sub> then jump to _l_.
-  * Takes 2 cycles.
-* ifless v, v, l
-  * If _v_<sub>1</sub> is less than _v_<sub>2</sub> then jump to _l_.
-  * Takes 2 cycles.
-* ifmore v, v, l
-  * If _v_<sub>1</sub> is greater than _v_<sub>2</sub> then jump to _l_.
-  * Takes 2 cycles.
-* add r, v, v
-  * Sets _r_ to _v_<sub>1</sub> plus _v_<sub>2</sub>.
-  * Takes 3 cycles.
-* sub r, v, v
-  * Sets _r_ to _v_<sub>1</sub> minus _v_<sub>2</sub>.
-  * Takes 3 cycles.
-* mult r, v, v
-  * Sets _r_ to _v_<sub>1</sub> times _v_<sub>2</sub>.
-  * Takes 5 cycles.
-* div r, v, v
-  * Sets _r_ to _v_<sub>1</sub> divided by _v_<sub>2</sub>.
-  * Takes 8 cycles.
-* mod r, v, v
-  * Sets _r_ to the remainder of _v_<sub>1</sub> divided by _v_<sub>2</sub>.
-  * Takes 7 cycles.
-* random r, v, v
-  * Sets _r_ to a random value between _v_<sub>1</sub> and _v_<sub>2</sub>, inclusive.
-  * Takes 6 cycles.
+| Op & operands       | Description          | CPU cycles |
+| ------------- |:-------------:| -----:|
+| harvest a      | Harvests fruit at _a_. | 5 (20 if it fails) |
+| plant a     | Plants 1 of your fruits at _a_.      |   4 |
+| peek r, a | Copies value at _a_ to _r_.     |    4 |
+| poke a, v      | Sets _a_ to _v_. | 3 |
+| goto l     | Jumps to _l_.      |   1 |
+| ifequal v, v, l | If _v_<sub>1</sub> equals _v_<sub>2</sub> then jump to _l_.  |    2 |
+| ifless v, v, l      | If _v_<sub>1</sub> is less than _v_<sub>2</sub> then jump to _l_. | 2 |
+| ifmore v, v, l     | If _v_<sub>1</sub> is greater than _v_<sub>2</sub> then jump to _l_.  |   2 |
+| add r, v, v | Sets _r_ to _v_<sub>1</sub> plus _v_<sub>2</sub>.   |   3 |
+| sub r, v, v      | Sets _r_ to _v_<sub>1</sub> minus _v_<sub>2</sub>. | 3 |
+| mult r, v, v     | Sets _r_ to _v_<sub>1</sub> multiplied by _v_<sub>2</sub>.  |   5 |
+| div r, v, v | Sets _r_ to _v_<sub>1</sub> divided by _v_<sub>2</sub>.     |  8 |
+| mod r, v, v      | Sets _r_ to the remainder of _v_<sub>1</sub> divided by _v_<sub>2</sub>. | 7 |
+| random r, v, v     | Sets _r_ to a random value between _v_<sub>1</sub> and _v_<sub>2</sub>, inclusive.    |   6 |
 
 
 ## Example program
